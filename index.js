@@ -10,7 +10,6 @@ const server = http.Server(app);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 connectDB();
-console.log(process.env);
 
 
 // app.use("/", portalRoutes)
