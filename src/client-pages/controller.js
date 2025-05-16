@@ -1,10 +1,10 @@
 import express from 'express';
-import { getPageHtml } from './service.js';
+import { getPageHtml, getHomePageHtml } from './service.js';
 
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-    const htmlText = await getPageHtml('home');
+    const htmlText = await getHomePageHtml();
 
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(htmlText);

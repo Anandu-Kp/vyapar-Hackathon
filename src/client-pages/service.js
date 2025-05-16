@@ -13,6 +13,76 @@ const readHtmlCodeFromSampleTextFile = async (fileName) => {
     return data;
 }
 
+const getComponent = async (componentId) => {
+    const db = await getDB();
+    const component = await db.collection(MongoCollections.PAGE_COMMENTS).aggregate([
+        {
+            $match: {
+                componentId: componentId
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                htmlCode: 1
+            }
+        }
+    ]).toArray();
+    if (component.length === 0) {
+        return "";
+    }
+    const htmlCode = component[0].htmlCode;
+    return htmlCode;
+}
+
+const getHomePageHtml = async () => {
+    // return await readHtmlCodeFromSampleTextFile('sample-data.txt');
+    let htmlCode = await getPageHtml('home');
+    if (htmlCode === undefined) {
+        return await readHtmlCodeFromSampleTextFile('page-not-found.txt');
+    }
+    const pageLinks = await getAllPageLinkData();
+    if (pageLinks.length === 0) {
+        return htmlCode;
+    }
+    const pageLinkHtml = await getComponent('page-link-from-home');
+    if (pageLinkHtml === undefined) {
+        return htmlCode;
+    }
+    let pageLinkHtmlCode = "";
+    for (const pageLink of pageLinks) {
+        const pageLinkHtmlCodeWithData = pageLinkHtml.replace(/{{pageId}}/g, pageLink.pageId)
+            .replace(/{{title}}/g, pageLink.pageTitle)
+            .replace(/{{description}}/g, pageLink.shortDescription);
+        pageLinkHtmlCode += pageLinkHtmlCodeWithData;
+    }
+    htmlCode = htmlCode.replace(/{{pageLinks}}/g, pageLinkHtmlCode);
+    return htmlCode;
+}
+
+const getAllPageLinkData = async () => {
+    const db = await getDB();
+    const pageLinks = await db.collection(MongoCollections.PAGES).aggregate([
+        {
+            $match: {
+                pageId: { $ne: 'home' }
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                pageId: 1,
+                pageTitle: 1,
+                shortDescription: 1,
+            }
+        }
+    ]).toArray();
+    if (pageLinks.length === 0) {
+        return [];
+    }
+    return pageLinks;
+}
+
 const getPageHtml = async (pageId) => {
     // return await readHtmlCodeFromSampleTextFile('sample-data.txt');
     const db = await getDB();
@@ -36,4 +106,4 @@ const getPageHtml = async (pageId) => {
     return htmlCode;
 }
 
-export { getPageHtml };
+export { getPageHtml, getHomePageHtml };

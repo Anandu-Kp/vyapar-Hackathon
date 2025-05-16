@@ -1,6 +1,5 @@
 import { PROMPT_TYPE } from "../common/enums.js";
 import { MODEL_API, MODEL_API_KEY } from "../config/env-configs.js";
-import axios from "axios";
 import ModelClient from "@azure-rest/ai-inference";
 import { AzureKeyCredential } from "@azure/core-auth";
 import { cleanTextFile, getEmbedding, refactorPrompt } from "../common/doc.js";
