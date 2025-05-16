@@ -1,7 +1,7 @@
 // db.js
 import { MongoClient } from 'mongodb';
 import { MONGO_CONNECTION_STRING } from './env-configs.js';
-// const client = new MongoClient(MONGO_CONNECTION_STRING);
+const client = new MongoClient(MONGO_CONNECTION_STRING);
 
 let db;
 
