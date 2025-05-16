@@ -1,18 +1,16 @@
+import { fetch, Headers, Request, Response } from 'undici';
+
+// Polyfill global fetch APIs for browser-like compatibility
+globalThis.fetch = fetch;
+globalThis.Headers = Headers;
+globalThis.Request = Request;
+globalThis.Response = Response;
+
 import fs from "fs";
 import { pipeline } from '@xenova/transformers';
 
 const extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
 
-/**
- * Cleans and normalizes text content from a file
- * This function performs several text cleaning operations to prepare the content
- * for further processing and embedding generation
- * 
- * @param {string} inputPath - Path to the input file to be cleaned
- * @param {string} outputPath - Path where the cleaned file should be saved (currently unused)
- * @returns {string} The cleaned and normalized text content
- * @throws {Error} If file reading fails or file doesn't exist
- */
 export const cleanTextFile = (inputPath, outputPath) => {
     try {
         // Step 1: Read the input file
@@ -40,15 +38,7 @@ export const cleanTextFile = (inputPath, outputPath) => {
     }
 }
 
-/**
- * Generates a vector embedding for the given text using the MiniLM model
- * This function converts text into a numerical representation (embedding)
- * that captures the semantic meaning of the text
- * 
- * @param {string} text - The input text to generate embedding for
- * @returns {Promise<Array<number>>} A 384-dimensional vector representing the text
- * @throws {Error} If embedding generation fails or model is not properly initialized
- */
+
 export const getEmbedding = async (text) => {
     try {
         // Step 1: Generate embedding using the MiniLM model
@@ -73,20 +63,6 @@ export const getEmbedding = async (text) => {
     }
 }
 
-/**
- * Replaces variables in a prompt template with their corresponding values
- * This function takes a prompt template containing placeholders like {key}
- * and replaces them with the provided values
- * 
- * @param {string} prompt - The prompt template containing variables in {key} format
- * @param {Array<{key: string, value: any}>} variables - Array of objects containing key-value pairs
- * @returns {string} The prompt with all variables replaced with their values
- * @example
- * // Input:
- * // prompt: "Hello {name}, your score is {score}"
- * // variables: [{key: "name", value: "John"}, {key: "score", value: "95"}]
- * // Output: "Hello John, your score is 95"
- */
 export const refactorPrompt = (prompt, variables = []) => {
     try {
         // Step 1: Initialize the updated prompt with the template
