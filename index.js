@@ -5,14 +5,17 @@ import { PORT } from './src/config/env-configs.js';
 import { connectDB } from './src/config/mongo-config.js';
 const app = express();
 import http from 'http';
+import clientPages from './src/client-pages/controller.js';
 const server = http.Server(app);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 connectDB();
 
+// init routes
+app.use('/', clientPages);
 
-// app.use("/", portalRoutes)
+
 app.set('port', PORT);
 
 server.listen(app.get('port'), () => {
