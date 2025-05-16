@@ -7,7 +7,7 @@ const app = express();
 import http from 'http';
 import clientPages from './src/client-pages/controller.js';
 const server = http.Server(app);
-
+import ApiRoutes from './src/routes.js';
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 connectDB();
@@ -15,7 +15,8 @@ connectDB();
 // init routes
 app.use('/', clientPages);
 
-
+app.use('/api', ApiRoutes)
+  
 app.set('port', PORT);
 
 server.listen(app.get('port'), () => {

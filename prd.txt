@@ -1,0 +1,116 @@
+
+
+1. PRD: PRD: User Stage Report (v1.1)
+Figma: https://www.figma.com/design/XTXroSLxyLvgUIGOZTr5wJ/NeoDove-Product?node-id=7580-167771&t=695JjKp3n3EpZi09-1
+1. Overview
+Feature Summary
+The User Stage Report provides a detailed, stage-wise distribution of leads for each user within selected pipelines and campaigns. Admins can filter the data by date type (disposed_at, created_at, assigned_at), pipeline, campaign, and user. The report dynamically adjusts based on the selected filters and provides real-time insights into lead stages across the organization.
+Business Objectives
+Enable admins to track user performance across lead stages.
+Provide real-time visibility into lead distribution within pipelines and campaigns.
+Enhance decision-making with actionable insights into lead movement between stages.
+User Value
+Admins: Gain better visibility into user activity and lead progression.
+Managers: Monitor team performance and identify bottlenecks in lead conversion.
+2. Functionality Requirements
+2.1 Feature Breakdown
+2.1.1 Filters
+All the filters must have filter persistence at browser level. The report includes the following filters:
+Date Filter:
+Dropdown with option:
+created_at
+Date range selection.
+Pipeline Filter:
+Single-select dropdown.
+Default selection: First pipeline created.
+If no users exist in the selected pipeline, display an existing empty state of the table.
+It dynamically loads as per the roles & permissions of the user. 
+Campaign Filter:
+Multi-select dropdown.
+Dynamically adjusts based on the selected pipeline.
+It dynamically loads as per the roles & permissions of the user. 
+If no campaign is selected, all campaigns will be considered selected by default.
+User Filter:
+Multi-select dropdown.
+Dynamically populated based on the selected pipeline and campaign.
+Contains only users associated with the selected pipeline and campaign.
+It dynamically loads as per the roles & permissions of the user. 
+2.1.2 Columns
+The table dynamically adjusts columns based on the selected pipeline and campaign:
+No. <sticky>
+User Name <sticky>
+Reporting Manager
+Date
+Show the title as "Choose Creation Date"
+Conversion %
+Total number of leads in +ive conversion stage / Aggregate count of all the leads in all the stages
+Up to 2 decimal places
+Total Assigned Leads
+Aggregate count of all the leads
+Stages
+Shows the count of leads for each user in their respective stages.
+Dynamically populated based on the selected pipeline, campaign, etc..
+Reflects the latest stage of each lead at the time of filtering.
+2.1.3 Click Behavior
+Numbers in the table are clickable - total assigned leads & stage columns.
+Clicking a number opens a new tab with a filtered view of leads in the pipeline's lead summary page:
+Stage - Filters applied automatically: User filter + Campaign filter + Stage filter.
+Total Assigned Leads - Filters applied automatically: User filter + Campaign filter.
+2.1.4 Default View
+When accessing the User Stage Report:
+Pipeline filter defaults to the first pipeline created.
+Date filter defaults to "Last 30 Days" & click on cross choose the filter of "Today"
+The default report displays data based on these configurations.
+
+2.1.5 Download
+Add the feature to download the report
+Same as what it is currently.
+
+2.1.6 Table Component
+Table component to be added
+
+2.1.7 Sorting
+Sorting to be added for following columns:
+User Name <sticky>
+Reporting Manager
+Conversion %
+Total Assigned Leads
+Stages
+2.2 Example Table
+No.
+User Name
+Reporting Manager
+Date
+Conversion %
+Total Assigned Leads
+Open
+In Progress
+Converted
+1
+User 1
+Abc
+2
+User 2
+Acb
+2.3 Specifications
+Real-time query from PostgreSQL (campaign_lead table).
+Data is non-incremental (can increase or decrease based on lead movement).
+
+2.4 Additional Details
+Description: Shows lead stage distribution by user across campaigns
+Position on the report list: 
+Move the message activity report at the bottom
+Add User Stage Report in place of it
+5. Example Scenarios
+5.1 Lead Movement Between Stages
+When a lead moves from "Open" to "In Progress" within a selected date range:
+The count for "Open" decreases by one.
+The count for "In Progress" increases by one.
+Counts reflect only the current stage of leads at the time of filtering.
+Example:
+On Day X:
+Open = 6
+In Progress = 5
+On Day X+1 (after one lead moves):
+Open = 5
+In Progress = 6
