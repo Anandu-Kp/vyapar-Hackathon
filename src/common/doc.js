@@ -108,7 +108,7 @@ export const getDocumentData = async (prdData, retry = 0) => {
         prd_text: prdData
     };
     const response = await axios.post(url, data, { headers });
-    if(response?.data?.error && retry < 3) {
+    if(response?.data?.error && retry < 5) {
         // retry
         return getDocumentData(prdData, retry + 1);
     }
@@ -152,13 +152,20 @@ export const getCombinedPrdData = async (prdData1, prdData2) => {
     const response = await client.path("/chat/completions").post({
         body: {
             messages: [
-                { role: "system", content: "Do not respond with intermediate placeholders like <thinking>. Only return the final answer" },
+                { role: "system", content: "You are a helpful assistant that combines two PRDs into one." },
                 { role: "user", content: updatedPrompt }
             ],
-            max_tokens: 2048,
+            max_tokens: 6000,
             model: modelName
         }
     });
     // TODO: To be validated
-    return response.body?.choices?.[0]?.message?.content;
+    const prdData = response.body?.choices?.[0]?.message?.content;
+    const updatedPrdData = cleanCombinedPrdData(prdData);
+    return updatedPrdData;
+}
+
+const cleanCombinedPrdData = (prdData) => {
+    const updatedPrdData = prdData.split('</think>')?.[1];
+    return updatedPrdData;
 }
