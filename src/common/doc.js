@@ -1,4 +1,5 @@
 import { fetch, Headers, Request, Response } from 'undici';
+import axios from 'axios';
 
 // Polyfill global fetch APIs for browser-like compatibility
 globalThis.fetch = fetch;
@@ -7,11 +8,15 @@ globalThis.Request = Request;
 globalThis.Response = Response;
 
 import fs from "fs";
-import { pipeline } from '@xenova/transformers';
+import { MODEL_API, MODEL_API_KEY, MODEL_NAME } from '../config/env-configs.js';
+import { AzureKeyCredential } from '@azure/core-auth';
+import ModelClient from '@azure-rest/ai-inference';
+import { getPrompt } from '../generate-docs/service.js';
+import { PROMPT_TYPE } from './enums.js';
 
-const extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+const modelEndpoint = "http://192.168.138.229:8000";
 
-export const cleanTextFile = (inputPath, outputPath) => {
+export const cleanTextFile = (inputPath) => {
     try {
         // Step 1: Read the input file
         const raw = fs.readFileSync(inputPath, "utf8");
@@ -38,29 +43,32 @@ export const cleanTextFile = (inputPath, outputPath) => {
     }
 }
 
-
-export const getEmbedding = async (text) => {
-    try {
-        // Step 1: Generate embedding using the MiniLM model
-        // The model processes the text and returns a tensor of embeddings
-        const output = await extractor(text);
-
-        // Step 2: Extract the embedding vector
-        // The model returns data in a specific format, we need the first vector
-        // This is a 384-dimensional vector that represents the text's meaning
-        const embedding = output.data[0];
-
-        // Step 3: Validate the embedding
-        if (!embedding || embedding.length !== 384) {
-            throw new Error("Invalid embedding generated: incorrect dimensions");
-        }
-
-        return embedding;
-    } catch (error) {
-        // Step 4: Error handling
-        console.error("Error in getEmbedding:", error.message);
-        throw new Error(`Failed to generate embedding: ${error.message}`);
+export const getDocumentId = async (text) => {
+    const url = `${modelEndpoint}/retrieve`;
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+    const data = {
+        document: text
+    };
+    const response = (await axios.post(url, data, { headers }))?.data?.match;
+    if(response && response.distance && response.distance >= 0 && response.distance < 0.5) {
+        return response;
     }
+    return {};
+}
+
+export const updateDocumentId = async (docId, text) => {
+    const url = `${modelEndpoint}/store`;
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+    const data = {
+        document_id: docId,
+        document: text
+    };
+    const response = await axios.post(url, data, { headers });
+    return response;
 }
 
 export const refactorPrompt = (prompt, variables = []) => {
@@ -73,8 +81,11 @@ export const refactorPrompt = (prompt, variables = []) => {
             // Only process if both key and value are provided
             if (variable.key && variable.value) {
                 // Replace {key} with the corresponding value
+                if( typeof variable.value === 'object' ) {
+                    variable.value = JSON.stringify(variable.value);
+                }
                 updatedPrompt = updatedPrompt.replace(
-                    `{${variable.key}}`, 
+                    `${variable.key}`, 
                     String(variable.value) // Ensure value is converted to string
                 );
             }
@@ -86,4 +97,75 @@ export const refactorPrompt = (prompt, variables = []) => {
         console.error("Error in refactorPrompt:", error.message);
         throw new Error(`Failed to refactor prompt: ${error.message}`);
     }
+}
+// TODO: To be changeds
+export const getDocumentData = async (prdData, retry = 0) => {
+    const url = `${modelEndpoint}/extract-page-details`;
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+    const data = {  
+        prd_text: prdData
+    };
+    const response = await axios.post(url, data, { headers });
+    if(response?.data?.error && retry < 5) {
+        // retry
+        return getDocumentData(prdData, retry + 1);
+    }
+    return response?.data || {};
+}
+
+export const updateDocumentInVectorDb = async (docId, text) => {
+    
+    const url = `${modelEndpoint}/update`;
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+    const data = {
+        document_id: docId,
+        document: text
+    };
+    const response = await axios.post(url, data, { headers });
+    return response;
+}
+
+export const getCombinedPrdData = async (prdData1, prdData2) => {
+    const endpoint = MODEL_API;
+    const modelName = MODEL_NAME;
+
+    const client = new ModelClient(endpoint, new AzureKeyCredential(MODEL_API_KEY));
+    const promptType = PROMPT_TYPE.COMBINE_PROMPT;
+
+    const prompt = await getPrompt(promptType);
+
+    const prdArray = [
+        { key: "<prd1>", value: 'PRD 1: '+prdData1 },
+    ];
+    if(prdData2) {
+        prdArray.push({ key: "<prd2>", value: 'PRD 2: '+prdData2 });
+    } else {
+        prdArray.push({ key: "<prd2>", value: '' });
+    }
+
+    const updatedPrompt = refactorPrompt(prompt, prdArray);
+
+    const response = await client.path("/chat/completions").post({
+        body: {
+            messages: [
+                { role: "system", content: "You are a helpful assistant that combines two PRDs into one." },
+                { role: "user", content: updatedPrompt }
+            ],
+            max_tokens: 6000,
+            model: modelName
+        }
+    });
+    // TODO: To be validated
+    const prdData = response.body?.choices?.[0]?.message?.content;
+    const updatedPrdData = cleanCombinedPrdData(prdData);
+    return updatedPrdData;
+}
+
+const cleanCombinedPrdData = (prdData) => {
+    const updatedPrdData = prdData.split('</think>')?.[1];
+    return updatedPrdData;
 }
