@@ -45,6 +45,32 @@ export const cleanTextFile = (inputPath) => {
     }
 }
 
+
+export const cleanText= (inputString) => {
+    try {
+
+        // Step 1: Clean and normalize the text content
+        const cleanedDoc = inputString
+            // Convert Windows line endings to Unix style
+            .replace(/\r\n/g, "\n")
+            
+            // Remove any non-printable characters except newlines
+            // \x20-\x7E represents printable ASCII characters
+            .replace(/[^\x20-\x7E\n]/g, "")
+            
+            // Replace multiple consecutive newlines with just two
+            .replace(/\n{2,}/g, "\n\n")
+            
+            // Remove any leading or trailing whitespace
+            .trim();
+
+        return cleanedDoc;
+    } catch (error) {
+        console.error("Error in cleanTextFile:", error.message);
+        throw new Error(`Failed to clean text file: ${error.message}`);
+    }
+}
+
 export const getDocumentId = async (text) => {
     const url = `${modelEndpoint}/retrieve`;
     const headers = {

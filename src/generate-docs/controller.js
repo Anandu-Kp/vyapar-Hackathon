@@ -2,8 +2,7 @@ import { processDocsService } from './service.js';
 
 export const processDocsController = async (req, res) => {
     try {
-        const response = await processDocsService();
-
+        const response = await processDocsService(req.body);
         return res.status(200).json({
             success: true,
             message: "Docs processed successfully",

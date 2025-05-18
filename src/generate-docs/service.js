@@ -1,6 +1,6 @@
 import { PROMPT_TYPE, TEMP_PROMPTS } from "../common/enums.js";
 import { API_VERSION, DEPLOYMENT, MODEL_API, MODEL_API_KEY, MODEL_NAME, } from "../config/env-configs.js";
-import { cleanTextFile, getCombinedPrdData, getDocumentData, getDocumentId, refactorPrompt, updateDocumentId, updateDocumentInVectorDb } from "../common/doc.js";
+import { cleanText, cleanTextFile, getCombinedPrdData, getDocumentData, getDocumentId, refactorPrompt, updateDocumentId, updateDocumentInVectorDb } from "../common/doc.js";
 import { getDB } from "../config/mongo-config.js";
 import { ObjectId } from "mongodb";
 import { AzureOpenAI } from "openai";
@@ -14,29 +14,31 @@ import { AzureOpenAI } from "openai";
  * @returns {Promise<void>}
  */
 export const processDocsService = async (data) => {
-    // const { prd, images } = data;
+    const { prd, images } = data;
 
-    const images = [
-        {
-            name: "reports-page",
-            url: "https://drive.google.com/file/d/1OpggCQ8dobg1lxvrAbXYMztX91Few3U-/view?usp=sharing"
-        },
-        {
-            name: "user-stage-report",
-            url: "https://drive.google.com/file/d/18a3DPVTw8tFvtE_36vaWZHqD3XEz4Ppe/view?usp=sharing"
-        },
-        {
-            name: "user-stage-report-column-modification",
-            url: "https://drive.google.com/file/d/1jovpOEgtyMcYdc-3tmIWHCYwXUdBSKo9/view?usp=sharing"
-        },
-        {
-            name: "user-stage-report-filter",
-            url: "https://drive.google.com/file/d/1S6tOzvlDlC51d8zkC1Cc-GxHmxP1mb_D/view?usp=drive_link"
-        },
-    ];
+    // const images = [
+    //     {
+    //         name: "reports-page",
+    //         url: "https://drive.google.com/file/d/1OpggCQ8dobg1lxvrAbXYMztX91Few3U-/view?usp=sharing"
+    //     },
+    //     {
+    //         name: "user-stage-report",
+    //         url: "https://drive.google.com/file/d/18a3DPVTw8tFvtE_36vaWZHqD3XEz4Ppe/view?usp=sharing"
+    //     },
+    //     {
+    //         name: "user-stage-report-column-modification",
+    //         url: "https://drive.google.com/file/d/1jovpOEgtyMcYdc-3tmIWHCYwXUdBSKo9/view?usp=sharing"
+    //     },
+    //     {
+    //         name: "user-stage-report-filter",
+    //         url: "https://drive.google.com/file/d/1S6tOzvlDlC51d8zkC1Cc-GxHmxP1mb_D/view?usp=drive_link"
+    //     },
+    // ];
 
     //TODO: To be removed
-    const prdData = cleanTextFile("prd.txt");
+    // const prdData = cleanTextFile("prd.txt");
+
+    const prdData = cleanText(prd);
 
     let result = await getDocumentId(prdData);
     let docId = result?.document_id;
@@ -185,6 +187,11 @@ export const storeHTMLTemplateInDb = async (cleanedHTMLResponse, prdData, docId 
             documentData = await getDocumentData(prdData);
             if(typeof documentData === 'string') {
                 documentData = JSON.parse(documentData);
+            }
+
+            const existingRecord = await db.collection("pages").findOne({ pageTitle: documentData.pageTitle });
+            if(existingRecord){
+               documentData.pageTitle += `-${new Date().getTime()}`;
             }
             documentData.htmlCode = cleanedHTMLResponse;
             documentData.created_at = new Date();
