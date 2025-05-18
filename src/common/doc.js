@@ -8,13 +8,15 @@ globalThis.Request = Request;
 globalThis.Response = Response;
 
 import fs from "fs";
-import { MODEL_API, MODEL_API_KEY, MODEL_NAME } from '../config/env-configs.js';
+import { API_VERSION, DEPLOYMENT, MODEL_API, MODEL_API_KEY, MODEL_NAME } from '../config/env-configs.js';
 import { AzureKeyCredential } from '@azure/core-auth';
 import ModelClient from '@azure-rest/ai-inference';
 import { getPrompt } from '../generate-docs/service.js';
 import { PROMPT_TYPE } from './enums.js';
+import { AzureOpenAI } from 'openai';
 
-const modelEndpoint = "http://192.168.138.229:8000";
+// const modelEndpoint = "http://192.168.138.229:8000";
+const modelEndpoint = "http://localhost:8000";
 
 export const cleanTextFile = (inputPath) => {
     try {
@@ -130,10 +132,9 @@ export const updateDocumentInVectorDb = async (docId, text) => {
 }
 
 export const getCombinedPrdData = async (prdData1, prdData2) => {
-    const endpoint = MODEL_API;
-    const modelName = MODEL_NAME;
-
-    const client = new ModelClient(endpoint, new AzureKeyCredential(MODEL_API_KEY));
+    const options = {endpoint: MODEL_API, apiKey: MODEL_API_KEY,deployment: DEPLOYMENT,apiVersion: API_VERSION}
+   
+    const client = new AzureOpenAI(options);
     const promptType = PROMPT_TYPE.COMBINE_PROMPT;
 
     const prompt = await getPrompt(promptType);
@@ -148,24 +149,20 @@ export const getCombinedPrdData = async (prdData1, prdData2) => {
     }
 
     const updatedPrompt = refactorPrompt(prompt, prdArray);
-
-    const response = await client.path("/chat/completions").post({
-        body: {
-            messages: [
-                { role: "system", content: "You are a helpful assistant that combines two PRDs into one." },
-                { role: "user", content: updatedPrompt }
-            ],
-            max_tokens: 6000,
-            model: modelName
-        }
-    });
+       const response = await client.chat.completions.create({
+           messages: [
+           { role:"system", content: "You are a helpful assistant that combines two PRDs into one" },
+           { role:"user", content: updatedPrompt }
+           ],
+           max_completion_tokens: 15000,
+           temperature: 1,
+           top_p: 1,
+           frequency_penalty: 0,
+           presence_penalty: 0,
+           model: MODEL_NAME
+       });
+   
     // TODO: To be validated
-    const prdData = response.body?.choices?.[0]?.message?.content;
-    const updatedPrdData = cleanCombinedPrdData(prdData);
-    return updatedPrdData;
-}
-
-const cleanCombinedPrdData = (prdData) => {
-    const updatedPrdData = prdData.split('</think>')?.[1];
-    return updatedPrdData;
+    const prdData = response.choices?.[0]?.message?.content;
+    return prdData;
 }

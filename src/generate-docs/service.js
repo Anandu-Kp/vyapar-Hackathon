@@ -1,10 +1,9 @@
 import { PROMPT_TYPE, TEMP_PROMPTS } from "../common/enums.js";
-import { MODEL_API, MODEL_API_KEY, MODEL_NAME } from "../config/env-configs.js";
-import ModelClient from "@azure-rest/ai-inference";
-import { AzureKeyCredential } from "@azure/core-auth";
+import { API_VERSION, DEPLOYMENT, MODEL_API, MODEL_API_KEY, MODEL_NAME, } from "../config/env-configs.js";
 import { cleanTextFile, getCombinedPrdData, getDocumentData, getDocumentId, refactorPrompt, updateDocumentId, updateDocumentInVectorDb } from "../common/doc.js";
 import { getDB } from "../config/mongo-config.js";
 import { ObjectId } from "mongodb";
+import { AzureOpenAI } from "openai";
 
 /**
  * Main service function to process documentation generation
@@ -59,9 +58,9 @@ export const processDocsService = async (data) => {
         { key: "<images>", value: images }
     ]);
 
-    const response = await getTemplateFromAI(updatedPrompt);
-    
-    const cleanedHTMLResponse = await cleanHTMLResponse(response)
+    // const response = await getTemplateFromAI(updatedPrompt);
+    const cleanedHTMLResponse =`<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <title>New Feature Update: User Stage Report (v1.1)</title>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <style>\n        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f9fafb; margin: 0; color: #222; }\n        .container { max-width: 760px; margin: 40px auto; padding: 32px; background: #fff; border-radius: 10px; box-shadow: 0 1px 8px rgba(0,0,0,0.07);}\n        h1 { font-size: 2rem; margin-bottom: 8px; }\n        h2 { font-size: 1.2rem; margin-top: 32px; color: #474747; }\n        ul { margin-left: 1.2em;}\n        li { margin-bottom: 8px;}\n        .img-block { margin: 24px 0; text-align: center;}\n        .img-block img { max-width: 100%; border-radius: 5px; border: 1px solid #eee;}\n        .img-block .caption { color: #5a5a5a; font-size: 0.96em; margin-top: 6px;}\n        @media (max-width: 660px) {\n          .container { padding: 14px; }\n        }\n        .update-tag { display: inline-block; background: #0c7dcd; color: #fff; padding: 2px 10px; border-radius: 6px; font-size: 0.97em;}\n    </style>\n</head>\n<body>\n<div class=\"container\">\n    <div class=\"update-tag\">New Feature</div>\n    <h1>User Stage Report <span style=\"color:#888; font-size:0.85em;\">(v1.1)</span></h1>\n    <p>\n        We're excited to introduce the <strong>User Stage Report</strong> – a new way for admins and managers to monitor lead stages and user performance across pipelines and campaigns, all in one place!\n    </p>\n\n    <div class=\"img-block\">\n        <img src=\"https://drive.google.com/uc?export=view&id=1OpggCQ8dobg1lxvrAbXYMztX91Few3U-\" alt=\"Reports Page View\" />\n        <div class=\"caption\">Access the new User Stage Report from the Reports section.</div>\n    </div>\n\n    <h2>✨ What's New?</h2>\n    <ul>\n        <li><strong>Stage-wise Lead Distribution:</strong> Instantly see how leads are distributed across various stages for each user.</li>\n        <li><strong>Flexible Filtering:</strong> Easily filter by date range, pipeline, campaign, and user – and filters remember your last selection on your browser.</li>\n        <li><strong>Interactive Table:</strong> Click on any lead count in the table to deep-dive into a detailed, filtered list.</li>\n        <li><strong>Download Capability:</strong> Quickly export your report for meetings or offline analysis.</li>\n        <li><strong>Real-time Data:</strong> All numbers reflect the latest updates, helping you keep a pulse on your team's progress.</li>\n    </ul>\n\n    <div class=\"img-block\">\n        <img src=\"https://drive.google.com/uc?export=view&id=18a3DPVTw8tFvtE_36vaWZHqD3XEz4Ppe\" alt=\"User Stage Report View\"/>\n        <div class=\"caption\">Get a clear view of user activities and lead stages with the new report.</div>\n    </div>\n\n    <h2>🔍 Key Benefits</h2>\n    <ul>\n        <li><strong>For Admins:</strong> Track your team's performance, identify bottlenecks, and get actionable insights—all in one view.</li>\n        <li><strong>For Managers:</strong> Monitor individual contributions and spot trends in how leads progress or get stuck.</li>\n        <li><strong>Filters That Work for You:</strong> Focus on just the data you need with simple filter controls.</li>\n    </ul>\n\n    <div class=\"img-block\">\n        <img src=\"https://drive.google.com/uc?export=view&id=1S6tOzvlDlC51d8zkC1Cc-GxHmxP1mb_D\" alt=\"User Stage Report Filters\" />\n        <div class=\"caption\">Filter your report by date range, pipeline, campaign, and user for tailored insights.</div>\n    </div>\n\n    <h2>🚀 How to Use the New User Stage Report</h2>\n    <ol>\n        <li>\n            <strong>Navigate to Reports:</strong> Open the Reports section and select <b>User Stage Report</b>.<br>\n        </li>\n        <li>\n            <strong>Apply Filters:</strong> Use the filters at the top to select your preferred date range, pipeline, campaigns, and users.<br>\n            <span style=\"color:#599;\">Tip: Filters are saved for you in your browser, so you don't have to set them every time.</span>\n        </li>\n        <li>\n            <strong>Understand at a Glance:</strong> The interactive table displays:\n            <ul>\n                <li>User names and their reporting managers</li>\n                <li>Conversion % – see how well leads are progressing</li>\n                <li>Stage-wise breakdown (e.g., Open, In Progress, Converted)</li>\n                <li>Total assigned leads per user</li>\n            </ul>\n        </li>\n        <li>\n            <strong>Drill Down:</strong> Click on any number (e.g., in Total Assigned Leads or specific lead stages) to view a detailed filtered list in a new tab.\n        </li>\n        <li>\n            <strong>Export:</strong> Click the download button to save your report for offline review or sharing.\n        </li>\n    </ol>\n\n    <div class=\"img-block\">\n        <img src=\"https://drive.google.com/uc?export=view&id=1jovpOEgtyMcYdc-3tmIWHCYwXUdBSKo9\" alt=\"Customized Columns and Sorting\"/>\n        <div class=\"caption\">Sort and customize your table – columns and filters adjust automatically based on your selections.</div>\n    </div>\n\n    <h2>📝 Example Scenario</h2>\n    <p>\n        Let's say a lead moves from <strong>"Open"</strong> to <strong>"In Progress"</strong> within a selected date range:\n    </p>\n    <ul>\n        <li>The <b>Open</b> stage count decreases by one.</li>\n        <li>The <b>In Progress</b> stage count increases by one.</li>\n        <li>All numbers reflect the most current stage of each lead at the moment you view the report.</li>\n    </ul>\n\n    <h2>💡 Need Help?</h2>\n    <p>\n        Have questions or feedback? Please reach out to your product support team! Check out the <a href=\"https://www.figma.com/design/XTXroSLxyLvgUIGOZTr5wJ/NeoDove-Product?node-id=7580-167771&t=695JjKp3n3EpZi09-1\" target=\"_blank\">detailed design mockups</a> for more visuals.\n    </p>\n</div>\n</body>\n</html>`
+    // const cleanedHTMLResponse = await cleanHTMLResponse(response)
 
     docId = await storeHTMLTemplateInDb(cleanedHTMLResponse, prdData, docId);
 
@@ -81,140 +80,27 @@ export const processDocsService = async (data) => {
  */
 const getTemplateFromAI = async (prdText) => {
 
-    const endpoint = MODEL_API;
-    const modelName = MODEL_NAME;
+    const options = {endpoint: MODEL_API, apiKey: MODEL_API_KEY,deployment: DEPLOYMENT,apiVersion: API_VERSION}
 
-    const client = new ModelClient(endpoint, new AzureKeyCredential(MODEL_API_KEY));
+    const client = new AzureOpenAI(options);
 
 
-    const response = await client.path("/chat/completions").post({
-        body: {
-            messages: [
-                { role: "user", content: prdText }
-            ],
-            max_tokens: 2048,
-            model: modelName
-        }
+    const response = await client.chat.completions.create({
+        messages: [
+        { role:"system", content: "You are a helpful assistant." },
+        { role:"user", content: prdText }
+        ],
+        max_completion_tokens: 15000,
+        temperature: 1,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0,
+        model: MODEL_NAME
     });
 
-    // {
-    //     request: {
-    //       url: "https://ai-jeevaathecoder3428ai424715828480.services.ai.azure.com/models/chat/completions?api-version=2024-05-01-preview",
-    //       body: "{\"messages\":[{\"role\":\"system\",\"content\":\"You are a helpful assistant.\"},{\"role\":\"user\",\"content\":\"Generate a clean and simple HTML announcement page for end users to communicate new feature updates.\\n\\nContext:\\n- This is **not** for developers, so avoid technical details like table structures, database, or real-time queries.\\n- Focus on **key benefits**, **what's new**, and **how to use** the new features.\\n- Attach images (provided in JSON) under the corresponding points as visual references.\\n- Use clear section headings, bullet points where needed, and embed images with captions.\\n- Use friendly language suitable for product users or admins.\\n\\nInputs:\\n1. PRD: 1. PRD: PRD: User Stage Report (v1.1)\\nFigma: https://www.figma.com/design/XTXroSLxyLvgUIGOZTr5wJ/NeoDove-Product?node-id=7580-167771&t=695JjKp3n3EpZi09-1\\n1. Overview\\nFeature Summary\\nThe User Stage Report provides a detailed, stage-wise distribution of leads for each user within selected pipelines and campaigns. Admins can filter the data by date type (disposed_at, created_at, assigned_at), pipeline, campaign, and user. The report dynamically adjusts based on the selected filters and provides real-time insights into lead stages across the organization.\\nBusiness Objectives\\nEnable admins to track user performance across lead stages.\\nProvide real-time visibility into lead distribution within pipelines and campaigns.\\nEnhance decision-making with actionable insights into lead movement between stages.\\nUser Value\\nAdmins: Gain better visibility into user activity and lead progression.\\nManagers: Monitor team performance and identify bottlenecks in lead conversion.\\n2. Functionality Requirements\\n2.1 Feature Breakdown\\n2.1.1 Filters\\nAll the filters must have filter persistence at browser level. The report includes the following filters:\\nDate Filter:\\nDropdown with option:\\ncreated_at\\nDate range selection.\\nPipeline Filter:\\nSingle-select dropdown.\\nDefault selection: First pipeline created.\\nIf no users exist in the selected pipeline, display an existing empty state of the table.\\nIt dynamically loads as per the roles & permissions of the user. \\nCampaign Filter:\\nMulti-select dropdown.\\nDynamically adjusts based on the selected pipeline.\\nIt dynamically loads as per the roles & permissions of the user. \\nIf no campaign is selected, all campaigns will be considered selected by default.\\nUser Filter:\\nMulti-select dropdown.\\nDynamically populated based on the selected pipeline and campaign.\\nContains only users associated with the selected pipeline and campaign.\\nIt dynamically loads as per the roles & permissions of the user. \\n2.1.2 Columns\\nThe table dynamically adjusts columns based on the selected pipeline and campaign:\\nNo. <sticky>\\nUser Name <sticky>\\nReporting Manager\\nDate\\nShow the title as \\\"Choose Creation Date\\\"\\nConversion %\\nTotal number of leads in +ive conversion stage / Aggregate count of all the leads in all the stages\\nUp to 2 decimal places\\nTotal Assigned Leads\\nAggregate count of all the leads\\nStages\\nShows the count of leads for each user in their respective stages.\\nDynamically populated based on the selected pipeline, campaign, etc..\\nReflects the latest stage of each lead at the time of filtering.\\n2.1.3 Click Behavior\\nNumbers in the table are clickable - total assigned leads & stage columns.\\nClicking a number opens a new tab with a filtered view of leads in the pipeline's lead summary page:\\nStage - Filters applied automatically: User filter + Campaign filter + Stage filter.\\nTotal Assigned Leads - Filters applied automatically: User filter + Campaign filter.\\n2.1.4 Default View\\nWhen accessing the User Stage Report:\\nPipeline filter defaults to the first pipeline created.\\nDate filter defaults to \\\"Last 30 Days\\\" & click on cross choose the filter of \\\"Today\\\"\\nThe default report displays data based on these configurations.\\n\\n2.1.5 Download\\nAdd the feature to download the report\\nSame as what it is currently.\\n\\n2.1.6 Table Component\\nTable component to be added\\n\\n2.1.7 Sorting\\nSorting to be added for following columns:\\nUser Name <sticky>\\nReporting Manager\\nConversion %\\nTotal Assigned Leads\\nStages\\n2.2 Example Table\\nNo.\\nUser Name\\nReporting Manager\\nDate\\nConversion %\\nTotal Assigned Leads\\nOpen\\nIn Progress\\nConverted\\n1\\nUser 1\\nAbc\\n2\\nUser 2\\nAcb\\n2.3 Specifications\\nReal-time query from PostgreSQL (campaign_lead table).\\nData is non-incremental (can increase or decrease based on lead movement).\\n\\n2.4 Additional Details\\nDescription: Shows lead stage distribution by user across campaigns\\nPosition on the report list: \\nMove the message activity report at the bottom\\nAdd User Stage Report in place of it\\n5. Example Scenarios\\n5.1 Lead Movement Between Stages\\nWhen a lead moves from \\\"Open\\\" to \\\"In Progress\\\" within a selected date range:\\nThe count for \\\"Open\\\" decreases by one.\\nThe count for \\\"In Progress\\\" increases by one.\\nCounts reflect only the current stage of leads at the time of filtering.\\nExample:\\nOn Day X:\\nOpen = 6\\nIn Progress = 5\\nOn Day X+1 (after one lead moves):\\nOpen = 5\\nIn Progress = 6\\n2. Images JSON: [{\\\"name\\\":\\\"reports-page\\\",\\\"url\\\":\\\"https://drive.google.com/file/d/1OpggCQ8dobg1lxvrAbXYMztX91Few3U-/view?usp=sharing\\\"},{\\\"name\\\":\\\"user-stage-report\\\",\\\"url\\\":\\\"https://drive.google.com/file/d/18a3DPVTw8tFvtE_36vaWZHqD3XEz4Ppe/view?usp=sharing\\\"},{\\\"name\\\":\\\"user-stage-report-column-modification\\\",\\\"url\\\":\\\"https://drive.google.com/file/d/1jovpOEgtyMcYdc-3tmIWHCYwXUdBSKo9/view?usp=sharing\\\"},{\\\"name\\\":\\\"user-stage-report-filter\\\",\\\"url\\\":\\\"https://drive.google.com/file/d/1S6tOzvlDlC51d8zkC1Cc-GxHmxP1mb_D/view?usp=drive_link\\\"}]\"}],\"max_tokens\":2048,\"model\":\"DeepSeek-R1\"}",
-    //       headers: {
-    //         _headersMap: {
-    //         },
-    //       },
-    //       method: "POST",
-    //       timeout: 0,
-    //       multipartBody: undefined,
-    //       formData: undefined,
-    //       disableKeepAlive: false,
-    //       proxySettings: undefined,
-    //       streamResponseStatusCodes: undefined,
-    //       withCredentials: false,
-    //       abortSignal: undefined,
-    //       onUploadProgress: undefined,
-    //       onDownloadProgress: undefined,
-    //       requestId: "6664743a-e9d5-4842-ac39-0817bbfbe4cf",
-    //       allowInsecureConnection: false,
-    //       enableBrowserStreams: true,
-    //       requestOverrides: undefined,
-    //       tracingOptions: {
-    //         tracingContext: {
-    //           _contextMap: {
-    //           },
-    //         },
-    //       },
-    //     },
-    //     headers: {
-    //       "transfer-encoding": "chunked",
-    //       "content-type": "application/json",
-    //       "content-encoding": "gzip",
-    //       vary: "Accept-Encoding",
-    //       "request-context": "appId=",
-    //       prompt_token_len: "1307",
-    //       sampling_token_len: "1556",
-    //       "apim-request-id": "1722a1e3-7998-48b4-a9d4-d6302d40b4ae",
-    //       "x-content-type-options": "nosniff",
-    //       "x-ms-region": "East US 2",
-    //       "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
-    //       date: "Fri, 16 May 2025 17:23:55 GMT",
-    //     },
-    //     status: "200",
-    //     body: {
-    //       choices: [
-    //         {
-    //           content_filter_results: {
-    //             hate: {
-    //               filtered: false,
-    //               severity: "safe",
-    //             },
-    //             self_harm: {
-    //               filtered: false,
-    //               severity: "safe",
-    //             },
-    //             sexual: {
-    //               filtered: false,
-    //               severity: "safe",
-    //             },
-    //             violence: {
-    //               filtered: false,
-    //               severity: "safe",
-    //             },
-    //           },
-    //           finish_reason: "stop",
-    //           index: 0,
-    //           message: {
-    //             content: "<think>\nOkay, I need to create a clean and simple HTML announcement page for end users about the new User Stage Report feature. Let me start by understanding the requirements.\n\nFirst, the context says it's for end users, not developers, so I should avoid technical jargon. Focus on key benefits, what's new, and how to use the features. Also, include images from the provided JSON under the relevant sections with captions.\n\nLooking at the PRD, the main points are the User Stage Report's purpose: stage-wise lead distribution, real-time insights, and dynamic filtering. The business objectives are tracking performance, visibility, and decision-making. User value is for admins and managers to monitor activity and bottlenecks.\n\nFunctionality requirements include filters (date, pipeline, campaign, user), columns with dynamic adjustments, clickable numbers for detailed views, default settings, download option, sorting, and real-time data. The images provided are reports-page, user-stage-report, user-stage-report-column-modification, and user-stage-report-filter.\n\nI should structure the HTML page with sections: Overview, Key Features, How to Use, Visual Guide. Use friendly language, bullet points for clarity, and embed images with captions. Make sure each image is placed under the corresponding feature explanation.\n\nCheck that all images from the JSON are included. The URLs are Google Drive links; I'll use them directly. Maybe add alt texts for accessibility. The sections should flow logically, starting with an overview, then benefits, features, how to use, and visuals.\n\nAvoid mentioning PostgreSQL or technical details about data queries. Emphasize real-time updates, ease of filtering, and actionable insights. Mention the download feature and sorting options as part of the functionality.\n\nAlso, ensure the HTML is clean: use a simple style with a max-width container, sans-serif font, and proper image sizing. Captions should be italicized and centered below images. Links should open in new tabs.\n\nDouble-check that all key points from the PRD are covered: dynamic filters, clickable numbers, default view settings, download capability. Use the example scenarios to illustrate how lead movements affect counts, but keep it brief.\n\nFinally, make sure the language is friendly and approachable, using phrases like \"Get Started\" and \"Dive into the details.\" Avoid any markdown, just pure HTML with inline styles for simplicity.\n</think>\n\nHere's a clean HTML announcement page focusing on user-friendly communication:\n\n```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <title>New Feature: User Stage Report</title>\n    <style>\n        body {\n            font-family: 'Segoe UI', Arial, sans-serif;\n            line-height: 1.6;\n            max-width: 1000px;\n            margin: 20px auto;\n            padding: 0 20px;\n            color: #333;\n        }\n        h1 { color: #2c3e50; }\n        h2 { color: #34495e; margin-top: 30px; }\n        img { \n            max-width: 100%;\n            border: 1px solid #ddd;\n            margin: 15px 0;\n            border-radius: 4px;\n        }\n        .caption {\n            font-style: italic;\n            color: #666;\n            text-align: center;\n            display: block;\n        }\n        ul {\n            padding-left: 20px;\n            margin: 15px 0;\n        }\n    </style>\n</head>\n<body>\n    <h1>🚀 New Feature Alert: User Stage Report</h1>\n    \n    <h2>What's New</h2>\n    <p>We're excited to introduce the User Stage Report - your new window into team performance and lead management!</p>\n    \n    <img src=\"https://drive.google.com/file/d/18a3DPVTw8tFvtE_36vaWZHqD3XEz4Ppe/view?usp=sharing\" alt=\"User Stage Report interface\">\n    <span class=\"caption\">Fig. 1: The new User Stage Report dashboard</span>\n\n    <h2>Key Benefits</h2>\n    <ul>\n        <li>📊 See lead distribution across stages at a glance</li>\n        <li>👥 Track individual and team performance metrics</li>\n        <li>⏱ Real-time updates as leads move through pipelines</li>\n        <li>🔍 Identify bottlenecks in your conversion process</li>\n    </ul>\n\n    <h2>How It Works</h2>\n    <h3>Smart Filters</h3>\n    <img src=\"https://drive.google.com/file/d/1S6tOzvlDlC51d8zkC1Cc-GxHmxP1mb_D/view?usp=drive_link\" alt=\"Filter options\">\n    <span class=\"caption\">Fig. 2: Customizable filters for focused insights</span>\n    \n    <ul>\n        <li>Choose date ranges and types (creation, assignment, or disposition dates)</li>\n        <li>Select specific pipelines, campaigns, or users</li>\n        <li>Filters remember your preferences between sessions</li>\n    </ul>\n\n    <h3>Interactive Table</h3>\n    <img src=\"https://drive.google.com/file/d/1jovpOEgtyMcYdc-3tmIWHCYwXUdBSKo9/view?usp=sharing\" alt=\"Table customization\">\n    <span class=\"caption\">Fig. 3: Customizable columns and sorting</span>\n    \n    <ul>\n        <li>Click any number to see detailed lead lists</li>\n        <li>Sort columns to prioritize important metrics</li>\n        <li>Sticky columns stay visible while scrolling</li>\n        <li>Download reports with one click</li>\n    </ul>\n\n    <h2>Getting Started</h2>\n    <p>Find the User Stage Report at the top of your reports list! 🎯</p>\n    <img src=\"https://drive.google.com/file/d/1OpggCQ8dobg1lxvrAbXYMztX91Few3U-/view?usp=sharing\" alt=\"Reports page location\">\n    <span class=\"caption\">Fig. 4: New report location in navigation</span>\n\n    <p><strong>Pro Tip:</strong> Start with the default view showing \"Last 30 Days\" data, then customize filters to match your needs!</p>\n\n    <h3>Need Help?</h3>\n    <p>Check our <a href=\"#\" target=\"_blank\">guide video</a> or contact support@neodove.com</p>\n</body>\n</html>\n```\n\nThis HTML page features:\n1. Clean, responsive design with readable typography\n2. Visual hierarchy with clear section headings\n3. Embedded images with descriptive captions\n4. User-focused language avoiding technical terms\n5. Clear benefit statements and usage tips\n6. Interactive elements preview (clickable numbers, sorting)\n7. Help resources and support information\n8. Mobile-friendly layout\n9. Visual indicators (emojis and icons) for scannability\n10. Real-world examples through annotated screenshots\n\nAll images open in full resolution when clicked (via Google Drive viewer) and are properly credited with captions. The styling is minimal but professional, ensuring good readability across devices.",
-    //             role: "assistant",
-    //             tool_calls: null,
-    //           },
-    //         },
-    //       ],
-    //       created: 1747416235,
-    //       id: "a2f693451c474a188db367b0a3d49e4c",
-    //       model: "deepseek-r1",
-    //       object: "chat.completion",
-    //       prompt_filter_results: [
-    //         {
-    //           prompt_index: 0,
-    //           content_filter_results: {
-    //             hate: {
-    //               filtered: false,
-    //               severity: "safe",
-    //             },
-    //             self_harm: {
-    //               filtered: false,
-    //               severity: "safe",
-    //             },
-    //             sexual: {
-    //               filtered: false,
-    //               severity: "safe",
-    //             },
-    //             violence: {
-    //               filtered: false,
-    //               severity: "safe",
-    //             },
-    //           },
-    //         },
-    //       ],
-    //       usage: {
-    //         completion_tokens: 1556,
-    //         prompt_tokens: 1307,
-    //         prompt_tokens_details: null,
-    //         total_tokens: 2863,
-    //       },
-    //     },
-    //   } 
 
-    if (response.status !== "200") {
-        throw response.body.error;
-    }
-
-    return response.body?.choices?.[0]?.message?.content;
+    return response.choices?.[0]?.message?.content;
 };
-
 /**
  * Retrieves similar documents from the database using vector similarity search
  * This function uses MongoDB's vector search to find documents with similar content

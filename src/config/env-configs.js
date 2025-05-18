@@ -7,3 +7,5 @@ export const MODEL_API = process.env.MODEL_API || '';
 export const MODEL_API_KEY = process.env.MODEL_API_KEY || '';
 export const MODEL_NAME = process.env.MODEL_NAME || '';
 export const MAX_TOKENS = process.env.MAX_TOKENS || 2048;
+export const API_VERSION = process.env.API_VERSION || "2024-12-01-preview";
+export const DEPLOYMENT = process.env.DEPLOYMENT || "gpt-4.1";
