@@ -43,7 +43,7 @@ const getHomePageHtml = async () => {
     }
     const pageLinks = await getAllPageLinkData();
     if (pageLinks.length === 0) {
-        return htmlCode;
+        return htmlCode.replace(/{{pageLinks}}/g, "");
     }
     const pageLinkHtml = await getComponent('page-link-from-home');
     if (pageLinkHtml === undefined) {
@@ -52,7 +52,7 @@ const getHomePageHtml = async () => {
     let pageLinkHtmlCode = "";
     for (const pageLink of pageLinks) {
         const pageLinkHtmlCodeWithData = pageLinkHtml.replace(/{{pageId}}/g, pageLink.pageId)
-            .replace(/{{title}}/g, pageLink.pageTitle)
+            .replace(/{{title}}/g, pageLink.pageTitle || pageLink.title)
             .replace(/{{description}}/g, pageLink.shortDescription);
         pageLinkHtmlCode += pageLinkHtmlCodeWithData;
     }
@@ -73,6 +73,7 @@ const getAllPageLinkData = async () => {
                 _id: 0,
                 pageId: 1,
                 pageTitle: 1,
+                title: 1,
                 shortDescription: 1,
             }
         }
