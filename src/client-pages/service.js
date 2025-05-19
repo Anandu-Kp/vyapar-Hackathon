@@ -43,7 +43,12 @@ const getHomePageHtml = async () => {
     }
     const pageLinks = await getAllPageLinkData();
     if (pageLinks.length === 0) {
-        return htmlCode;
+        const noPagesSection = await readHtmlCodeFromSampleTextFile('no-pages.txt')
+        htmlCode = htmlCode.replace(/{{pageLinks}}/g, "");
+        return htmlCode.replace(/{{noPages}}/g, noPagesSection);
+    }
+    else{
+       htmlCode = htmlCode.replace(/{{noPages}}/g, "");
     }
     const pageLinkHtml = await getComponent('page-link-from-home');
     if (pageLinkHtml === undefined) {

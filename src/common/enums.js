@@ -6,37 +6,54 @@ export const PROMPT_TYPE = {
 
 
 export const TEMP_PROMPTS = {
-    UPDATE_PROMPT: `I am updating my product documentation website. I’ll provide:
-1. An existing HTML page that follows our documentation design
-2. A new feature PRD in text format (non-technical, user-facing)
-3. An array of images with image names and URLs
+    UPDATE_PROMPT: `You are helping update a product documentation website using the following inputs:
 
-I want you to:
-- Combine the new PRD content with the HTML structure.
-- Integrate the images under appropriate sections, sorted by 'image.name' relevance to the PRD points.
-- Maintain the same visual and structural style as the given HTML template.
-- Group all content under a common 'Reports' section if relevant (e.g. User Stage Report, User Call Report).
-- Do **not** include technical implementation details (e.g., internal database notes, query logic, or feasibility tags).
-- Use user-friendly headings and short benefit-driven descriptions.
-- Don’t use the term “New Feature”; this is an update to existing documentation.
-- Keep the image captions consistent and meaningful (e.g., “Fig. 1: Call Summary Table”).
+Inputs:
+1. html: The existing HTML page that defines the structure and visual style. Use this as the template for formatting and layout.
+2. prd: A user-facing, non-technical description of new functionality or updates to existing features.
+3. images: An array of objects containing image name and url. These images are visual references related to specific PRD sections.
 
-Finally, return a complete HTML page combining all of this.
+Your Task:
+- Use the existing HTML page as the base structure and style guide.
+- Combine the new PRD content into the HTML layout, preserving its visual hierarchy and formatting.
+- Organically integrate images into relevant sections by matching image.name keywords with related PRD points. Place each image under the most appropriate heading or bullet point.
+- Add clear, concise captions to each image using the format:
+“Fig. X: [Meaningful Description]”
+(e.g., Fig. 1: Call Summary Table)
+- Group the new content under the appropriate Reports section, such as "User Stage Report" or "User Call Report", depending on relevance.
+- Maintain a user-focused tone with simple language and short, benefit-driven descriptions.
+- Do not include technical implementation details such as internal database notes, query logic, or dev-related tags.
+- Do not label the content as a “new feature.” It should be presented as a natural update or extension of existing functionality.
 
-Now I’ll share the three parts:
+Output:
+Return a complete and valid HTML page that:
+- Matches the layout and visual style of the original HTML input.
+- Combines the original content with the updated PRD and image references.
+
+Inputs:
 1. html: <htmlCode>
 2. prd: <prd>
 3. images: <images>
 `,
 
-    CREATE_PROMPT: `Generate a clean and simple HTML announcement page for end users to communicate new feature updates.
+    CREATE_PROMPT: `Generate a clean, user-friendly HTML announcement page to communicate a new product feature update to end users (such as customers, admins, or non-technical staff).
 
-Context:
-- This is **not** for developers, so avoid technical details like table structures, database, or real-time queries.
-- Focus on **key benefits**, **what's new**, and **how to use** the new features.
-- Attach images (provided in JSON) under the corresponding points as visual references.
-- Use clear section headings, bullet points where needed, and embed images with captions.
-- Use friendly language suitable for product users or admins.
+Requirements:
+- Use the provided PRD (Product Requirements Document) as the primary source for the update.
+- Use the provided list of images (with names and URLs) to visually support the relevant sections of the content.
+- The tone should be friendly and professional—avoid technical jargon or developer-focused terms (e.g., database, tables, API, Figma).
+
+Focus on:
+- What's new - clearly explain the new feature(s).
+- Key benefits - how this helps the user.
+- How to use it - simple steps or explanations for using the feature.
+
+HTML Guidelines:
+- Structure the content with clear headings (e.g., "What's New", "Benefits", "How to Use").
+- Use bullet points where appropriate.
+- Embed relevant images with captions underneath each one.
+- Design should be visually clean and modern, but keep it simple—suitable for use as part of a documentation or announcement site.
+- Ensure the HTML is well-structured and semantic.
 
 Inputs:
 1. PRD: <prd>

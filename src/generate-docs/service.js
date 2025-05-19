@@ -18,20 +18,20 @@ export const processDocsService = async (data) => {
 
     // const images = [
     //     {
-    //         name: "reports-page",
-    //         url: "https://drive.google.com/file/d/1OpggCQ8dobg1lxvrAbXYMztX91Few3U-/view?usp=sharing"
+    //         "name": "reports-page",
+    //         "url": "https://drive.usercontent.google.com/download?id=1OpggCQ8dobg1lxvrAbXYMztX91Few3U-"
     //     },
     //     {
-    //         name: "user-stage-report",
-    //         url: "https://drive.google.com/file/d/18a3DPVTw8tFvtE_36vaWZHqD3XEz4Ppe/view?usp=sharing"
+    //         "name": "user-stage-report",
+    //         "url": "https://drive.usercontent.google.com/u/0/uc?id=18a3DPVTw8tFvtE_36vaWZHqD3XEz4Ppe"
     //     },
     //     {
-    //         name: "user-stage-report-column-modification",
-    //         url: "https://drive.google.com/file/d/1jovpOEgtyMcYdc-3tmIWHCYwXUdBSKo9/view?usp=sharing"
+    //         "name": "user-stage-report-column-modification",
+    //         "url": "https://drive.usercontent.google.com/u/0/uc?id=1jovpOEgtyMcYdc-3tmIWHCYwXUdBSKo9"
     //     },
     //     {
-    //         name: "user-stage-report-filter",
-    //         url: "https://drive.google.com/file/d/1S6tOzvlDlC51d8zkC1Cc-GxHmxP1mb_D/view?usp=drive_link"
+    //         "name": "user-stage-report-filter",
+    //         "url": "https://drive.usercontent.google.com/u/0/uc?id=1S6tOzvlDlC51d8zkC1Cc-GxHmxP1mb_D"
     //     },
     // ];
 
@@ -60,9 +60,9 @@ export const processDocsService = async (data) => {
         { key: "<images>", value: images }
     ]);
 
-    // const response = await getTemplateFromAI(updatedPrompt);
-    const cleanedHTMLResponse =`<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <title>New Feature Update: User Stage Report (v1.1)</title>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <style>\n        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f9fafb; margin: 0; color: #222; }\n        .container { max-width: 760px; margin: 40px auto; padding: 32px; background: #fff; border-radius: 10px; box-shadow: 0 1px 8px rgba(0,0,0,0.07);}\n        h1 { font-size: 2rem; margin-bottom: 8px; }\n        h2 { font-size: 1.2rem; margin-top: 32px; color: #474747; }\n        ul { margin-left: 1.2em;}\n        li { margin-bottom: 8px;}\n        .img-block { margin: 24px 0; text-align: center;}\n        .img-block img { max-width: 100%; border-radius: 5px; border: 1px solid #eee;}\n        .img-block .caption { color: #5a5a5a; font-size: 0.96em; margin-top: 6px;}\n        @media (max-width: 660px) {\n          .container { padding: 14px; }\n        }\n        .update-tag { display: inline-block; background: #0c7dcd; color: #fff; padding: 2px 10px; border-radius: 6px; font-size: 0.97em;}\n    </style>\n</head>\n<body>\n<div class=\"container\">\n    <div class=\"update-tag\">New Feature</div>\n    <h1>User Stage Report <span style=\"color:#888; font-size:0.85em;\">(v1.1)</span></h1>\n    <p>\n        We're excited to introduce the <strong>User Stage Report</strong> – a new way for admins and managers to monitor lead stages and user performance across pipelines and campaigns, all in one place!\n    </p>\n\n    <div class=\"img-block\">\n        <img src=\"https://drive.google.com/uc?export=view&id=1OpggCQ8dobg1lxvrAbXYMztX91Few3U-\" alt=\"Reports Page View\" />\n        <div class=\"caption\">Access the new User Stage Report from the Reports section.</div>\n    </div>\n\n    <h2>✨ What's New?</h2>\n    <ul>\n        <li><strong>Stage-wise Lead Distribution:</strong> Instantly see how leads are distributed across various stages for each user.</li>\n        <li><strong>Flexible Filtering:</strong> Easily filter by date range, pipeline, campaign, and user – and filters remember your last selection on your browser.</li>\n        <li><strong>Interactive Table:</strong> Click on any lead count in the table to deep-dive into a detailed, filtered list.</li>\n        <li><strong>Download Capability:</strong> Quickly export your report for meetings or offline analysis.</li>\n        <li><strong>Real-time Data:</strong> All numbers reflect the latest updates, helping you keep a pulse on your team's progress.</li>\n    </ul>\n\n    <div class=\"img-block\">\n        <img src=\"https://drive.google.com/uc?export=view&id=18a3DPVTw8tFvtE_36vaWZHqD3XEz4Ppe\" alt=\"User Stage Report View\"/>\n        <div class=\"caption\">Get a clear view of user activities and lead stages with the new report.</div>\n    </div>\n\n    <h2>🔍 Key Benefits</h2>\n    <ul>\n        <li><strong>For Admins:</strong> Track your team's performance, identify bottlenecks, and get actionable insights—all in one view.</li>\n        <li><strong>For Managers:</strong> Monitor individual contributions and spot trends in how leads progress or get stuck.</li>\n        <li><strong>Filters That Work for You:</strong> Focus on just the data you need with simple filter controls.</li>\n    </ul>\n\n    <div class=\"img-block\">\n        <img src=\"https://drive.google.com/uc?export=view&id=1S6tOzvlDlC51d8zkC1Cc-GxHmxP1mb_D\" alt=\"User Stage Report Filters\" />\n        <div class=\"caption\">Filter your report by date range, pipeline, campaign, and user for tailored insights.</div>\n    </div>\n\n    <h2>🚀 How to Use the New User Stage Report</h2>\n    <ol>\n        <li>\n            <strong>Navigate to Reports:</strong> Open the Reports section and select <b>User Stage Report</b>.<br>\n        </li>\n        <li>\n            <strong>Apply Filters:</strong> Use the filters at the top to select your preferred date range, pipeline, campaigns, and users.<br>\n            <span style=\"color:#599;\">Tip: Filters are saved for you in your browser, so you don't have to set them every time.</span>\n        </li>\n        <li>\n            <strong>Understand at a Glance:</strong> The interactive table displays:\n            <ul>\n                <li>User names and their reporting managers</li>\n                <li>Conversion % – see how well leads are progressing</li>\n                <li>Stage-wise breakdown (e.g., Open, In Progress, Converted)</li>\n                <li>Total assigned leads per user</li>\n            </ul>\n        </li>\n        <li>\n            <strong>Drill Down:</strong> Click on any number (e.g., in Total Assigned Leads or specific lead stages) to view a detailed filtered list in a new tab.\n        </li>\n        <li>\n            <strong>Export:</strong> Click the download button to save your report for offline review or sharing.\n        </li>\n    </ol>\n\n    <div class=\"img-block\">\n        <img src=\"https://drive.google.com/uc?export=view&id=1jovpOEgtyMcYdc-3tmIWHCYwXUdBSKo9\" alt=\"Customized Columns and Sorting\"/>\n        <div class=\"caption\">Sort and customize your table – columns and filters adjust automatically based on your selections.</div>\n    </div>\n\n    <h2>📝 Example Scenario</h2>\n    <p>\n        Let's say a lead moves from <strong>"Open"</strong> to <strong>"In Progress"</strong> within a selected date range:\n    </p>\n    <ul>\n        <li>The <b>Open</b> stage count decreases by one.</li>\n        <li>The <b>In Progress</b> stage count increases by one.</li>\n        <li>All numbers reflect the most current stage of each lead at the moment you view the report.</li>\n    </ul>\n\n    <h2>💡 Need Help?</h2>\n    <p>\n        Have questions or feedback? Please reach out to your product support team! Check out the <a href=\"https://www.figma.com/design/XTXroSLxyLvgUIGOZTr5wJ/NeoDove-Product?node-id=7580-167771&t=695JjKp3n3EpZi09-1\" target=\"_blank\">detailed design mockups</a> for more visuals.\n    </p>\n</div>\n</body>\n</html>`
-    // const cleanedHTMLResponse = await cleanHTMLResponse(response)
+    const response = await getTemplateFromAI(updatedPrompt);
+    
+    const cleanedHTMLResponse = await cleanHTMLResponse(response)
 
     docId = await storeHTMLTemplateInDb(cleanedHTMLResponse, prdData, docId);
 
